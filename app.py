@@ -203,57 +203,57 @@ def relevance_score(current: Dict[str, Any], prior: Dict[str, Any]) -> float:
 
     return score
 
-def is_relevant(current, prior):
-    curr_desc = current.get("study_description", "").lower()
-    prior_desc = prior.get("study_description", "").lower()
+# def is_relevant(current, prior):
+#     curr_desc = current.get("study_description", "").lower()
+#     prior_desc = prior.get("study_description", "").lower()
 
-    curr_words = set(curr_desc.split())
-    prior_words = set(prior_desc.split())
+#     curr_words = set(curr_desc.split())
+#     prior_words = set(prior_desc.split())
 
-    # 🔥 NEW: stronger similarity
-    common_words = curr_words & prior_words
-    similarity = len(common_words) / max(len(curr_words), 1)
+#     # 🔥 NEW: stronger similarity
+#     common_words = curr_words & prior_words
+#     similarity = len(common_words) / max(len(curr_words), 1)
 
-    # body part match (simple but effective)
-    important_parts = ["brain", "chest", "abdomen", "pelvis", "spine"]
-    body_match = any(p in curr_desc and p in prior_desc for p in important_parts)
+#     # body part match (simple but effective)
+#     important_parts = ["brain", "chest", "abdomen", "pelvis", "spine"]
+#     body_match = any(p in curr_desc and p in prior_desc for p in important_parts)
 
-    # modality match
-    modality_keywords = ["mri", "ct", "xr", "xray", "ultrasound"]
-    modality_match = any(m in curr_desc and m in prior_desc for m in modality_keywords)
+#     # modality match
+#     modality_keywords = ["mri", "ct", "xr", "xray", "ultrasound"]
+#     modality_match = any(m in curr_desc and m in prior_desc for m in modality_keywords)
 
-    # 🔥 UPDATED decision logic
-    if body_match and modality_match:
-        return True
-
-    if similarity > 0.4:
-        return True
-
-    if body_match and similarity > 0.2:
-        return True
-
-    return False
-# def is_relevant(current: Dict[str, Any], prior: Dict[str, Any]) -> bool:
-#     score = relevance_score(current, prior)
-
-#     curr_desc = current.get("study_description", "")
-#     prior_desc = prior.get("study_description", "")
-
-#     curr_parts = detect_body_parts(curr_desc)
-#     prior_parts = detect_body_parts(prior_desc)
-#     curr_modality = detect_modality(curr_desc)
-#     prior_modality = detect_modality(prior_desc)
-
-#     # High-confidence positive rule.
-#     if curr_parts & prior_parts and curr_modality == prior_modality:
+#     # 🔥 UPDATED decision logic
+#     if body_match and modality_match:
 #         return True
 
-#     # Same anatomy cross-modality can be relevant if score is decent.
-#     if curr_parts & prior_parts and score >= 0.35:
+#     if similarity > 0.4:
 #         return True
 
-#     # Otherwise threshold.
-#     return score >= 0.55
+#     if body_match and similarity > 0.2:
+#         return True
+
+#     return False
+def is_relevant(current: Dict[str, Any], prior: Dict[str, Any]) -> bool:
+    score = relevance_score(current, prior)
+
+    curr_desc = current.get("study_description", "")
+    prior_desc = prior.get("study_description", "")
+
+    curr_parts = detect_body_parts(curr_desc)
+    prior_parts = detect_body_parts(prior_desc)
+    curr_modality = detect_modality(curr_desc)
+    prior_modality = detect_modality(prior_desc)
+
+    # High-confidence positive rule.
+    if curr_parts & prior_parts and curr_modality == prior_modality:
+        return True
+
+    # Same anatomy cross-modality can be relevant if score is decent.
+    if curr_parts & prior_parts and score >= 0.35:
+        return True
+
+    # Otherwise threshold.
+    return score >= 0.55
 
 
 @app.route("/", methods=["GET"])
